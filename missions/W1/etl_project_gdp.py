@@ -110,7 +110,7 @@ def scrap_region_to_df():
     return df_region
 
 
-def extract_to_json(df):
+def load_to_json(df):
     logging.info("JSON 파일로 저장 시작")
     output_file = 'Countries_by_GDP.json'
 
@@ -118,7 +118,7 @@ def extract_to_json(df):
     logging.info(f"JSON 파일로 저장 완료")
 
 
-def extract_to_db(df):
+def load_to_db(df):
     logging.info("데이터베이스 연결 시작")
     table_name = 'Countries_by_GDP'
     db_name = 'World_Economies.db'
@@ -222,8 +222,8 @@ def main():
 
     logging.info("-----Load-----")
 
-    extract_to_json(df_merged)
-    extract_to_db(df_merged)
+    load_to_json(df_merged)
+    load_to_db(df_merged)
 
     logging.info("!!!!!ETL 프로세스 완료!!!!!")
 
