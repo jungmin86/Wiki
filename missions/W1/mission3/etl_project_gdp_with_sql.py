@@ -7,9 +7,11 @@ import logging
 from datetime import datetime
 import sqlite3
 import json
+import os
 
+current_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
 # 로깅 환경 설정
-logging.basicConfig(filename='./missions/W1/mission3/etl_project_log.txt', level=logging.INFO,
+logging.basicConfig(filename=current_dir+'/etl_project_log.txt', level=logging.INFO,
                     format='%(asctime)s  %(message)s', datefmt=datetime.now().strftime('%Y-%b-%d-%H-%M-%S')
                     )
 
@@ -66,7 +68,7 @@ def preprocess_data(df_gdp):
 
 def change_country_name(df_gdp):
     logging.info("국가명 가공 시작")
-    with open('./missions/W1/mission3/countries.json', 'r', encoding='utf-8') as file:
+    with open(current_dir + 'countries.json', 'r', encoding='utf-8') as file:
         name_dict = json.load(file)
 
     for old_name, new_name in name_dict.items():
@@ -127,7 +129,8 @@ def transform(df):
 
 def load_to_json(df):
     logging.info("JSON 파일로 저장 시작")
-    output_file = './missions/W1/mission3/Countries_by_GDP.json'
+    output_file = os.path.dirname(os.path.abspath(
+        __file__)) + '/Countries_by_GDP.json'
 
     df.to_json(output_file, orient='records')
     logging.info(f"JSON 파일로 저장 완료")
@@ -136,7 +139,7 @@ def load_to_json(df):
 def load_to_db(df):
     logging.info("데이터베이스 연결 시작")
     table_name = 'Countries_by_GDP'
-    db_path = './missions/W1/mission3/'
+    db_path = current_dir
     db_name = 'World_Economies.db'
 
     conn = sqlite3.connect(db_path + db_name)
@@ -173,7 +176,7 @@ def load(df_transformed):
 def print_over_100B_USD_by_sql():
     print("-----GDP가 100B USD 이상이 되는 국가만(SQL)-----")
     table_name = 'Countries_by_GDP'
-    db_path = './missions/W1/mission3/'
+    db_path = current_dir
     db_name = 'World_Economies.db'
 
     conn = sqlite3.connect(db_path + db_name)
@@ -194,7 +197,7 @@ def print_over_100B_USD_by_sql():
 
 def print_top5_groupby_region_by_sql():
     print("-----각 Region별로 top5 국가의 GDP 평균(SQL)-----")
-    db_path = './missions/W1/mission3/'
+    db_path = current_dir
     db_name = 'World_Economies.db'
     table_name = 'Countries_by_GDP'
 
