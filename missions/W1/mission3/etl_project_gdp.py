@@ -115,8 +115,8 @@ def merge_countries_and_region(df, df_region):
     return df_merged
 
 
-def transform(rows):
-    df_gdp = preprocess_data(rows)
+def transform(df):
+    df_gdp = preprocess_data(df)
     df_region = scrap_region_to_df()
     df_gdp = change_country_name(df_gdp)
     df_sort = sort_by_gdp(df_gdp)
