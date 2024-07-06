@@ -23,32 +23,43 @@ def extract():
 
     table = soup.find('table', {'class': 'wikitable'})
     rows = table.find_all('tr')[2:]
-    logging.info("GDP 데이터 수집 완료")
-
-    return rows
-
-
-def preprocess_data(rows):
-
     fields = []
     for row in rows:
         data = row.find_all('td')
         data = [d.text.strip().replace(',', '') for d in data]
-
         if data[0] == 'World':
             continue
+        country = data[0]
         gdp = data[1]
         if gdp != '—':
-            country = data[0]
-            gdp = round(int(gdp) / 1000, 2)
-            year = re.sub(r"\[.*?\]", '', data[2]).strip()
+            year = data[2]
         else:
+            year = '-'
             continue
 
         fields.append([country, gdp, year])
 
     df_gdp = pd.DataFrame(
         fields, columns=["Country", "GDP_IN_BILLION_USD", "Year"])
+
+    logging.info("GDP 데이터 수집 완료")
+
+    return df_gdp
+
+
+def preprocess_data(df_gdp):
+
+    logging.info("GDP 단위 가공 시작")
+
+    # GDP를 백만(million)에서 십억(billion) 단위로 변환
+    df_gdp['GDP_IN_BILLION_USD'] = df_gdp['GDP_IN_BILLION_USD'].apply(
+        lambda x: round(int(x) / 1000, 2))
+
+    # Year 컬럼에서 [~] 내용 제외
+    df_gdp['Year'] = df_gdp['Year'].apply(
+        lambda x: re.sub(r"\[.*?\]", '', x).strip())
+
+    logging.info("GDP 단위 가공 완료")
 
     return df_gdp
 
@@ -186,11 +197,11 @@ def main():
         logging.info("!!!!!ETL 프로세스 시작!!!!!")
         logging.info("-----Extract-----")
 
-        rows = extract()
+        df_gdp = extract()
 
         logging.info("-----Transform-----")
 
-        df_transformed = transform(rows)
+        df_transformed = transform(df_gdp)
 
         logging.info("-----Load-----")
 
